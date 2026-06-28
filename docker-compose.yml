@@ -1,0 +1,100 @@
+networks:
+  app:
+
+services:
+  nginx:
+    image: nginx:1.30.2-alpine
+    container_name: nginx_container
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - './app/nginx.conf:/etc/nginx/nginx.conf'
+      - './app/certbot/conf:/etc/letsencrypt'
+      - './app/certbot/www:/var/www/certbot'
+    depends_on:
+      - python
+    networks:
+      - app
+
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          memory: 512M
+    container_name: python_container
+    restart: unless-stopped
+    volumes:
+      - './app/log_files:/usr/src/app/log_files'
+    env_file: .env
+    networks:
+      - app
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgresql:
+    build:
+      context: app/postgresql
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          memory: 2G
+    container_name: postgresql_container
+    restart: unless-stopped
+    volumes:
+      - './app/postgresql/data:/var/lib/postgresql/data'
+      - './app/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro'
+    env_file: app/postgresql/.env
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\"" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:8-alpine
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          memory: 512M
+    container_name: redis_container
+    restart: unless-stopped
+    command: sh -c 'redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"'
+    volumes:
+      - './app/redis/data:/data'
+    env_file: .env
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD", "sh", "-c", 'redis-cli -a "$$REDIS_PASSWORD" ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  certbot:
+    image: certbot/certbot:nightly
+    container_name: certbot_container
+    volumes:
+      - './app/certbot/conf:/etc/letsencrypt'
+      - './app/certbot/www:/var/www/certbot'
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email your@email.com -d your_domain.com --agree-tos

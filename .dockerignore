@@ -1,0 +1,13 @@
+docker-compose.yml
+
+.venv
+__pycache__
+*.pyc
+.env
+.git/
+
+app/certbot/
+app/postgresql/
+app/nginx.conf
+app/redis/
+app/log_files/
