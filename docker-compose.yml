@@ -91,10 +91,40 @@ services:
       timeout: 5s
       retries: 5
 
-  certbot:
-    image: certbot/certbot:nightly
-    container_name: certbot_container
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          memory: 1G
+    container_name: celery_container
+    restart: unless-stopped
+    command: celery -A src.celery_app.celery_app worker --loglevel=info --concurrency=2 --pool=prefork
     volumes:
-      - './app/certbot/conf:/etc/letsencrypt'
-      - './app/certbot/www:/var/www/certbot'
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email your@email.com -d your_domain.com --agree-tos
+      - './app/log_files:/usr/src/app/log_files'
+    env_file: .env
+    networks:
+      - app
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot_container
+    networks:
+      - app
+    depends_on:
+      nginx:
+        condition: service_started
+    volumes:
+      - './src/certbot/conf:/etc/letsencrypt'
+      - './src/certbot/www:/var/www/certbot'
+    command: certonly --webroot -w /var/www/certbot --email your@email.com -d your_domain.com --agree-tos --keep-until-expiring
