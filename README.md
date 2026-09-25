@@ -8,7 +8,7 @@ Python 3.13
 
 UV
 
--PostgreSQL
+- PostgreSQL
 - Redis
 - Celery
 - Nginx
@@ -22,7 +22,7 @@ UV
 ## Usage
 1. Add your code or modules in /app directory
 2. Create file .env in the root directory containing variables
-
+```bash
 DB_HOST=
 DB_PORT=
 DB_USER=
@@ -32,7 +32,7 @@ DB_NAME=
 REDIS_HOST=
 REDIS_PORT=
 REDIS_PASSWORD=
-
+```
 3. Edit Nginx config /app/nginx.conf
 4. Edit Celery app /app/celery/celery_app.py
 5. Use variables from .env for PostgreSQL and Redis connection
