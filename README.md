@@ -4,21 +4,15 @@ FastConfig is a ready-to-use infrastructure for projects using FastAPI.
 
 ## Built with
 
-PostgreSQL
+Python 3.13
 
-Java 11
+UV
 
-- Maven
-
-- Lombok
-
-- Spring Boot
-
-- Spring Boot Starter Data JPA
-
-- Spring Boot Test
-
-- Log4j2
+-PostgreSQL
+- Redis
+- Celery
+- Nginx
+- Certbot
 
 ## Installation
 
