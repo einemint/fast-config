@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/sh
 set -e
 mkdir -p /usr/src/app/log_files
 chown -R appuser:appuser /usr/src/app/log_files
-
 cd /usr/src/app
+
+if [ "$1" = 'celery' ]; then
+    exec gosu appuser "$@"
+fi
+
 exec gosu appuser gunicorn main:app \
   --bind 0.0.0.0:8020 \
   --workers 4 \
