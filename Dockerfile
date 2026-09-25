@@ -1,4 +1,4 @@
-FROM python:3.14-slim AS builder
+FROM python:3.13.0-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -12,7 +12,7 @@ COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-dev
 
 
-FROM python:3.14-slim
+FROM python:3.13.0-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends gosu \
     && rm -rf /var/lib/apt/lists/*
