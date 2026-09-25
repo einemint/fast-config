@@ -1,4 +1,4 @@
-#!/sh
+#!/bin/sh
 set -e
 mkdir -p /usr/src/app/log_files
 chown -R appuser:appuser /usr/src/app/log_files
