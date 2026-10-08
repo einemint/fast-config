@@ -1,8 +1,8 @@
-from app.settings import settings
+from app.settings.settings import settings
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.admin import setup_admin
+from app.admin.setup import setup_admin
 
 app = FastAPI()
 
