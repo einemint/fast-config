@@ -11,6 +11,7 @@ UV
 - PostgreSQL
 - Redis
 - Celery
+- Starlette Admin
 - Nginx
 - Certbot
 
@@ -32,6 +33,8 @@ DB_NAME=
 REDIS_HOST=
 REDIS_PORT=
 REDIS_PASSWORD=
+
+ENABLE_ADMIN_PANEL=true
 ```
 3. Edit Nginx config /app/nginx.conf
 4. Edit Celery app /app/celery/celery_app.py
