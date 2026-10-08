@@ -1,6 +1,8 @@
+from app.settings import settings
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.admin import setup_admin
 
 app = FastAPI()
 
@@ -16,6 +18,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if settings.admin_settings.enable_admin_panel:
+    setup_admin(app)
 
 if __name__ == "__main__":
     uvicorn.run(
